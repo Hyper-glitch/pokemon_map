@@ -4,5 +4,5 @@ from .models import Pokemon
 
 
 @admin.register(Pokemon)
-class BookInstanceAdmin(admin.ModelAdmin):
+class PokemonAdmin(admin.ModelAdmin):
     pass
