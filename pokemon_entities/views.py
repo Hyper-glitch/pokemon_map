@@ -9,46 +9,34 @@ from pokemon_entities.models import Pokemon, PokemonEntity
 MOSCOW_CENTER = [55.751244, 37.618423]
 
 
-def add_pokemon_to_map(map, lat, lon, image_url):
-    icon = folium.features.CustomIcon(
-        image_url,
-        icon_size=(50, 50),
-    )
-    folium.Marker(
-        [lat, lon],
-        # Warning! `tooltip` attribute is disabled intentionally
-        # to fix strange folium cyrillic encoding bug
-        icon=icon,
-    ).add_to(map)
+def add_pokemon_to_map(map, entity, url):
+    icon = folium.features.CustomIcon(url, icon_size=(50, 50))
+    # Warning! `tooltip` attribute is disabled intentionally to fix strange folium cyrillic encoding bug
+    folium.Marker([entity.latitude, entity.longitude], icon=icon).add_to(map)
 
 
 def show_all_pokemons(request):
     pokemon_entities = PokemonEntity.objects.all()
+    pokemons = []
     map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
 
     for entity in pokemon_entities:
-        absolute_url = request.build_absolute_uri(entity.pokemon.image.url)
-        add_pokemon_to_map(
-            map=map, lat=entity.latitude, lon=entity.longitude,
-            image_url=absolute_url,
-        )
-
-    serialized_pokemons = Pokemon.objects.all()
-    pokemons_on_page = []
-
-    for pokemon in serialized_pokemons:
-        absolute_url = request.build_absolute_uri(pokemon.image.url)
-        pokemons_on_page.append(
+        image_url = request.build_absolute_uri(entity.pokemon.image.url)
+        pokemons.append(
             {
-                'pokemon_id': pokemon.id,
-                'img_url': absolute_url,
-                'title_ru': pokemon.title,
+                'pokemon_id': entity.pokemon.id,
+                'img_url': image_url,
+                'title_ru': entity.pokemon.title,
             }
         )
+        add_pokemon_to_map(map=map, entity=entity, url=image_url)
+
+    unique_pokemons = list({pokemon['pokemon_id']: pokemon for pokemon in pokemons}.values())
     context = {
         'map': map._repr_html_(),
-        'pokemons': pokemons_on_page,
+        'pokemons': unique_pokemons,
     }
+
     return render(request, 'mainpage.html', context=context)
 
 
