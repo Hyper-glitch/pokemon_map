@@ -9,5 +9,5 @@ class PokemonAdmin(admin.ModelAdmin):
 
 
 @admin.register(PokemonEntity)
-class PokemonGeoAdmin(admin.ModelAdmin):
+class PokemonEntityAdmin(admin.ModelAdmin):
     pass
