@@ -5,6 +5,10 @@ class Pokemon(models.Model):
     title = models.CharField(max_length=255)
     image = models.ImageField(blank=True, null=True, upload_to='pokemons')
 
+    class Meta:
+        verbose_name = "Покемон"
+        verbose_name_plural = "Покемоны"
+
     def __str__(self):
         return self.title
 
@@ -20,6 +24,10 @@ class PokemonEntity(models.Model):
     strength = models.PositiveSmallIntegerField(default=10, verbose_name='Атака')
     defence = models.PositiveSmallIntegerField(default=10, verbose_name='Защита')
     stamina = models.PositiveSmallIntegerField(default=10, verbose_name='Выносливость')
+
+    class Meta:
+        verbose_name = "Особь покемона"
+        verbose_name_plural = "Особи покемона"
 
     def __str__(self):
         return self.pokemon.title
