@@ -19,7 +19,7 @@ def show_all_pokemons(request):
             {
                 'pokemon_id': pokemon.id,
                 'img_url': image_url,
-                'title_ru': pokemon.title,
+                'title_ru': pokemon.title_ru,
             }
         )
 
@@ -36,9 +36,13 @@ def show_pokemon(request, pokemon_id):
     show_pokemons_on_map(request, folium_map)
     pokemon = Pokemon.objects.get(id=pokemon_id)
     image_url = request.build_absolute_uri(pokemon.image.url)
+
     serialized_pokemon = {
         'img_url': image_url,
-        'title_ru': pokemon.title,
+        'title_ru': pokemon.title_ru,
+        'title_en': pokemon.title_en,
+        'title_jp': pokemon.title_jp,
+        'description': pokemon.description,
     }
     context = {'map': folium_map._repr_html_(), 'pokemon': serialized_pokemon}
     return render(request, 'pokemon.html', context=context)
