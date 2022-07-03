@@ -2,15 +2,18 @@ from django.db import models  # noqa F401
 
 
 class Pokemon(models.Model):
-    title = models.CharField(max_length=255, verbose_name='Название')
+    title_ru = models.CharField(max_length=255, null=True, verbose_name='Название на русском')
+    title_en = models.CharField(max_length=255, null=True, verbose_name='Название на английском')
+    title_jp = models.CharField(max_length=255, null=True, verbose_name='Название на японском')
     image = models.ImageField(blank=True, null=True, upload_to='pokemons', verbose_name='Изображение')
+    description = models.TextField(blank=True, verbose_name='Описание')
 
     class Meta:
         verbose_name = "Покемон"
         verbose_name_plural = "Покемоны"
 
     def __str__(self):
-        return self.title
+        return self.title_ru
 
 
 class PokemonEntity(models.Model):
@@ -30,4 +33,4 @@ class PokemonEntity(models.Model):
         verbose_name_plural = "Особи покемона"
 
     def __str__(self):
-        return self.pokemon.title
+        return self.pokemon.title_ru
