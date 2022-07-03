@@ -1,10 +1,12 @@
 import json
 
 import folium
+from django.db.models import Q
 from django.http import HttpResponseNotFound
 from django.shortcuts import render
+from django.utils.timezone import localtime
 
-from pokemon_entities.models import Pokemon, PokemonEntity
+from pokemon_entities.models import PokemonEntity, Pokemon
 
 MOSCOW_CENTER = [55.751244, 37.618423]
 
@@ -16,25 +18,31 @@ def add_pokemon_to_map(map, entity, url):
 
 
 def show_all_pokemons(request):
-    pokemon_entities = PokemonEntity.objects.all()
-    pokemons = []
+    now = localtime()
+    actual_pokemon_entities = PokemonEntity.objects.filter(Q(appeared_at__lt=now) & Q(disappeared_at__gt=now))
+
+    serialized_pokemons = []
+    pokemons = Pokemon.objects.all()
+
     map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
 
-    for entity in pokemon_entities:
+    for entity in actual_pokemon_entities:
         image_url = request.build_absolute_uri(entity.pokemon.image.url)
-        pokemons.append(
-            {
-                'pokemon_id': entity.pokemon.id,
-                'img_url': image_url,
-                'title_ru': entity.pokemon.title,
-            }
-        )
         add_pokemon_to_map(map=map, entity=entity, url=image_url)
 
-    unique_pokemons = list({pokemon['pokemon_id']: pokemon for pokemon in pokemons}.values())
+    for pokemon in pokemons:
+        image_url = request.build_absolute_uri(pokemon.image.url)
+        serialized_pokemons.append(
+            {
+                'pokemon_id': pokemon.id,
+                'img_url': image_url,
+                'title_ru': pokemon.title,
+            }
+        )
+
     context = {
         'map': map._repr_html_(),
-        'pokemons': unique_pokemons,
+        'pokemons': serialized_pokemons,
     }
 
     return render(request, 'mainpage.html', context=context)
