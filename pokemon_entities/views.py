@@ -1,4 +1,6 @@
 import folium
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+from django.http import HttpResponseNotFound
 from django.shortcuts import render
 
 from pokemon_entities.models import Pokemon
@@ -34,8 +36,25 @@ def show_all_pokemons(request):
 def show_pokemon(request, pokemon_id):
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
     show_pokemons_on_map(request, folium_map)
-    pokemon = Pokemon.objects.get(id=pokemon_id)
+    try:
+        pokemon = Pokemon.objects.get(id=pokemon_id)
+    except (MultipleObjectsReturned, ObjectDoesNotExist):
+        return HttpResponseNotFound('<h1>Такой покемон не найден</h1>')
     image_url = request.build_absolute_uri(pokemon.image.url)
+    previous_evolution, next_evolution = None, None
+
+    if pokemon.previous_evolution:
+        previous_evolution = {
+            'title_ru': pokemon.previous_evolution.title_ru,
+            'pokemon_id': pokemon.previous_evolution.id,
+            'img_url': request.build_absolute_uri(pokemon.previous_evolution.image.url),
+        }
+    if pokemon.next_evolution:
+        next_evolution = {
+            'title_ru': pokemon.next_evolution.title_ru,
+            'pokemon_id': pokemon.next_evolution.id,
+            'img_url': request.build_absolute_uri(pokemon.next_evolution.image.url),
+        }
 
     serialized_pokemon = {
         'img_url': image_url,
@@ -43,6 +62,8 @@ def show_pokemon(request, pokemon_id):
         'title_en': pokemon.title_en,
         'title_jp': pokemon.title_jp,
         'description': pokemon.description,
+        'previous_evolution': previous_evolution,
+        'next_evolution': next_evolution,
     }
     context = {'map': folium_map._repr_html_(), 'pokemon': serialized_pokemon}
     return render(request, 'pokemon.html', context=context)
