@@ -29,11 +29,11 @@ class PokemonEntity(models.Model):
     longitude = models.FloatField(max_length=6, verbose_name=' Долгота')
     appeared_at = models.DateTimeField(verbose_name='Появился в')
     disappeared_at = models.DateTimeField(verbose_name='Исчез в')
-    level = models.PositiveSmallIntegerField(default=1, verbose_name='Уровень')
-    health = models.PositiveSmallIntegerField(default=100, verbose_name='Здоровье')
-    strength = models.PositiveSmallIntegerField(default=10, verbose_name='Атака')
-    defence = models.PositiveSmallIntegerField(default=10, verbose_name='Защита')
-    stamina = models.PositiveSmallIntegerField(default=10, verbose_name='Выносливость')
+    level = models.PositiveSmallIntegerField(default=1, verbose_name='Уровень', blank=True)
+    health = models.PositiveSmallIntegerField(default=100, verbose_name='Здоровье', blank=True)
+    strength = models.PositiveSmallIntegerField(default=10, verbose_name='Атака', blank=True)
+    defence = models.PositiveSmallIntegerField(default=10, verbose_name='Защита', blank=True)
+    stamina = models.PositiveSmallIntegerField(default=10, verbose_name='Выносливость', blank=True)
 
     class Meta:
         verbose_name = "Особь покемона"
