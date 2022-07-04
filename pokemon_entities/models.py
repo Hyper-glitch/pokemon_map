@@ -11,10 +11,6 @@ class Pokemon(models.Model):
         'self', on_delete=models.SET_NULL, null=True, blank=True,
         verbose_name='Из кого эволюционировал', related_name='pokemon_previous_evolution',
     )
-    next_evolution = models.ForeignKey(
-        'self', on_delete=models.SET_NULL, null=True, blank=True,
-        verbose_name='В кого эволюционирует', related_name='pokemon_next_evolution',
-    )
 
     class Meta:
         verbose_name = "Покемон"
