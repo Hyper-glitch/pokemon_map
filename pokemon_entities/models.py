@@ -1,7 +1,9 @@
+"""Module for Pokemon and PokemonEntity models."""
 from django.db import models  # noqa F401
 
 
 class Pokemon(models.Model):
+    """Pokemon model."""
     title_ru = models.CharField(max_length=255, verbose_name='Название на русском')
     title_en = models.CharField(max_length=255, blank=True, verbose_name='Название на английском')
     title_jp = models.CharField(max_length=255, blank=True, verbose_name='Название на японском')
@@ -21,6 +23,7 @@ class Pokemon(models.Model):
 
 
 class PokemonEntity(models.Model):
+    """PokemonEntity, related to the Pokemon model."""
     pokemon = models.ForeignKey(Pokemon, on_delete=models.CASCADE, verbose_name='Покемон')
     latitude = models.FloatField(max_length=6, verbose_name=' Широта')
     longitude = models.FloatField(max_length=6, verbose_name=' Долгота')
