@@ -11,7 +11,7 @@ class Pokemon(models.Model):
     description = models.TextField(blank=True, verbose_name='Описание')
     previous_evolution = models.ForeignKey(
         'self', on_delete=models.SET_NULL, null=True, blank=True,
-        verbose_name='Из кого эволюционировал', related_name='pokemon_previous_evolution',
+        verbose_name='Из кого эволюционировал', related_name='next_evolutions',
     )
 
     class Meta:
@@ -24,7 +24,10 @@ class Pokemon(models.Model):
 
 class PokemonEntity(models.Model):
     """PokemonEntity, related to the Pokemon model."""
-    pokemon = models.ForeignKey(Pokemon, on_delete=models.CASCADE, verbose_name='Покемон')
+    pokemon = models.ForeignKey(
+        Pokemon, on_delete=models.CASCADE, verbose_name='Покемон',
+        related_name='entities',
+    )
     latitude = models.FloatField(max_length=6, verbose_name=' Широта')
     longitude = models.FloatField(max_length=6, verbose_name=' Долгота')
     appeared_at = models.DateTimeField(verbose_name='Появился в')
@@ -41,3 +44,9 @@ class PokemonEntity(models.Model):
 
     def __str__(self):
         return self.pokemon.title_ru
+
+
+class PokemonElementType:
+    """PokemonElementType, related to the Pokemon model."""
+    title = models.CharField(max_length=255, verbose_name='Название')
+    pokemon = models.ManyToManyField(Pokemon)
