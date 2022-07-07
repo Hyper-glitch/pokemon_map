@@ -6,17 +6,18 @@ from django.shortcuts import render
 from django.utils.timezone import localtime
 
 from pokemon_entities.models import Pokemon, PokemonEntity
-from pokemon_entities.show_pokemons_tools import show_pokemons_on_map, MOSCOW_CENTER
+from pokemon_entities.show_pokemons_tools import show_pokemon_on_map, MOSCOW_CENTER
 
 
 def show_all_pokemons(request):
+    folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
     serialized_pokemons = []
     pokemons = Pokemon.objects.all()
     now = localtime()
     actual_pokemon_entities = PokemonEntity.objects.filter(Q(appeared_at__lt=now) & Q(disappeared_at__gt=now))
 
     for entity in actual_pokemon_entities:
-        show_pokemons_on_map(request=request, entity=entity)
+        show_pokemon_on_map(request=request, entity=entity, folium_map=folium_map)
 
     for pokemon in pokemons:
         image_url = request.build_absolute_uri(pokemon.image.url)
@@ -29,7 +30,7 @@ def show_all_pokemons(request):
         )
 
     context = {
-        'map': folium.Map(location=MOSCOW_CENTER, zoom_start=12)._repr_html_(),
+        'map': folium_map._repr_html_(),
         'pokemons': serialized_pokemons,
     }
 
@@ -37,6 +38,7 @@ def show_all_pokemons(request):
 
 
 def show_pokemon(request, pokemon_id):
+    folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
     previous_evolution = None
     serialized_next_evolution = None
     now = localtime()
@@ -44,7 +46,7 @@ def show_pokemon(request, pokemon_id):
         Q(appeared_at__lt=now) & Q(disappeared_at__gt=now))
 
     for entity in actual_pokemon_entities:
-        show_pokemons_on_map(request=request, entity=entity)
+        show_pokemon_on_map(request=request, entity=entity, folium_map=folium_map)
 
     try:
         pokemon = Pokemon.objects.get(id=pokemon_id)
@@ -81,5 +83,5 @@ def show_pokemon(request, pokemon_id):
         'previous_evolution': previous_evolution,
         'next_evolution': serialized_next_evolution,
     }
-    context = {'map': folium.Map(location=MOSCOW_CENTER, zoom_start=12)._repr_html_()._repr_html_(), 'pokemon': serialized_pokemon}
+    context = {'map': folium_map._repr_html_(), 'pokemon': serialized_pokemon}
     return render(request, 'pokemon.html', context=context)
