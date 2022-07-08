@@ -12,7 +12,7 @@ def show_pokemon_on_map(request, entity: PokemonEntity, folium_map):
     """Add pokemon entity to a map.
     :param request: request from template side.
     :param entity: pokemon's entity obj from database.
-    :param folium_map: a map from folium libray.
+    :param folium_map: a map from folium libray  render pokemons.
     :return: None
     """
     image_url = request.build_absolute_uri(entity.pokemon.image.url)
@@ -36,20 +36,17 @@ def serialize_pokemon(request, pokemon, pokemon_id):
 
     if next_evolution_entity:
         next_evolution = next_evolution_entity.pokemon
-    else:
-        next_evolution = None
+        serialized_next_evolution = {
+            'title_ru': next_evolution.title_ru,
+            'pokemon_id': next_evolution.id,
+            'img_url': request.build_absolute_uri(next_evolution.image.url),
+        }
 
     if pokemon.previous_evolution:
         previous_evolution = {
             'title_ru': pokemon.previous_evolution.title_ru,
             'pokemon_id': pokemon.previous_evolution.id,
             'img_url': request.build_absolute_uri(pokemon.previous_evolution.image.url),
-        }
-    if next_evolution:
-        serialized_next_evolution = {
-            'title_ru': next_evolution.title_ru,
-            'pokemon_id': next_evolution.id,
-            'img_url': request.build_absolute_uri(next_evolution.image.url),
         }
 
     image_url = request.build_absolute_uri(pokemon.image.url)
