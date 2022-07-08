@@ -4,15 +4,17 @@ from django.http import HttpResponseNotFound
 from django.shortcuts import render
 
 from pokemon_entities.models import Pokemon
-from pokemon_entities.show_pokemons_tools import show_pokemon_on_map, MOSCOW_CENTER, get_actual_pokemons, \
-    serialize_pokemon
+from pokemon_entities.show_pokemons_tools import (
+    show_pokemon_on_map, MOSCOW_CENTER, get_actual_pokemons,
+    serialize_pokemon,
+)
 
 
 def show_all_pokemons(request):
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
     serialized_pokemons = []
     pokemons = Pokemon.objects.all()
-    actual_pokemon_entities = get_actual_pokemons()
+    actual_pokemon_entities = get_actual_pokemons(show_all=True)
 
     for entity in actual_pokemon_entities:
         show_pokemon_on_map(request=request, entity=entity, folium_map=folium_map)
