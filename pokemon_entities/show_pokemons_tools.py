@@ -1,9 +1,9 @@
-"""Module that helps add and show pokemons to a map."""
+"""Module that helps filter and show pokemons on a map."""
 import folium
 from django.db.models import Q
 from django.utils.timezone import localtime
 
-from pokemon_entities.models import PokemonEntity
+from pokemon_entities.models import PokemonEntity, Pokemon
 
 MOSCOW_CENTER = [55.751244, 37.618423]
 
@@ -21,7 +21,12 @@ def show_pokemon_on_map(request, entity: PokemonEntity, folium_map):
     folium.Marker([entity.latitude, entity.longitude], icon=icon).add_to(folium_map)
 
 
-def get_actual_pokemons(pokemon_id=None, show_all=True):
+def get_actual_pokemons(pokemon_id=None, show_all=None):
+    """Filter pokemon's entities from database in order to appeared and disappeared time. Also could show all pokemons.
+    :param pokemon_id: id of a pokemon obj.
+    :param show_all: flag that control to render all pokemons or one entity.
+    :return: all_entities: filtered entities queryset.
+    """
     now = localtime()
     all_entities = PokemonEntity.objects.filter(Q(appeared_at__lt=now) & Q(disappeared_at__gt=now))
     if not show_all:
@@ -29,7 +34,13 @@ def get_actual_pokemons(pokemon_id=None, show_all=True):
     return all_entities
 
 
-def serialize_pokemon(request, pokemon, pokemon_id):
+def serialize_pokemon(request, pokemon: Pokemon, pokemon_id: int) -> dict:
+    """Serialize current pokemon with next and previous evolution.
+    :param request: request from template side.
+    :param pokemon: pokemon obj from database.
+    :param pokemon_id: id of a pokemon obj.
+    :return: serialized_pokemon: serialized pokemon's information.
+    """
     previous_evolution = None
     serialized_next_evolution = None
     next_evolution_entity = PokemonEntity.objects.filter(pokemon__previous_evolution=pokemon_id).first()
