@@ -9,7 +9,8 @@ MOSCOW_CENTER = [55.751244, 37.618423]
 
 
 def show_pokemon_on_map(request, entity: PokemonEntity, folium_map):
-    """Add pokemon entity to a map.
+    """
+    Add pokemon entity to a map.
     :param request: request from template side.
     :param entity: pokemon's entity obj from database.
     :param folium_map: a map from folium libray  render pokemons.
@@ -22,7 +23,8 @@ def show_pokemon_on_map(request, entity: PokemonEntity, folium_map):
 
 
 def get_actual_pokemons(pokemon_id=None, show_all=None):
-    """Filter pokemon's entities from database in order to appeared and disappeared time. Also could show all pokemons.
+    """
+    Filter pokemon's entities from database in order to appeared and disappeared time. Also could show all pokemons.
     :param pokemon_id: id of a pokemon obj.
     :param show_all: flag that control to render all pokemons or one entity.
     :return: all_entities: filtered entities queryset.
@@ -34,23 +36,22 @@ def get_actual_pokemons(pokemon_id=None, show_all=None):
     return all_entities
 
 
-def serialize_pokemon(request, pokemon: Pokemon, pokemon_id: int) -> dict:
-    """Serialize current pokemon with next and previous evolution.
+def serialize_pokemon(request, pokemon: Pokemon) -> dict:
+    """
+    Serialize current pokemon with next and previous evolution.
     :param request: request from template side.
     :param pokemon: pokemon obj from database.
-    :param pokemon_id: id of a pokemon obj.
     :return: serialized_pokemon: serialized pokemon's information.
     """
     previous_evolution = None
     serialized_next_evolution = None
-    next_evolution_entity = PokemonEntity.objects.filter(pokemon__previous_evolution=pokemon_id).first()
+    next_evolution_entity = pokemon.next_evolutions.first()
 
     if next_evolution_entity:
-        next_evolution = next_evolution_entity.pokemon
         serialized_next_evolution = {
-            'title_ru': next_evolution.title_ru,
-            'pokemon_id': next_evolution.id,
-            'img_url': request.build_absolute_uri(next_evolution.image.url),
+            'title_ru': next_evolution_entity.title_ru,
+            'pokemon_id': next_evolution_entity.id,
+            'img_url': request.build_absolute_uri(next_evolution_entity.image.url),
         }
 
     if pokemon.previous_evolution:
