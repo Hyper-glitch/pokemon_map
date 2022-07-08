@@ -1,7 +1,5 @@
 import folium
-from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
-from django.http import HttpResponseNotFound
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 
 from pokemon_entities.models import Pokemon
 from pokemon_entities.show_pokemons_tools import (
@@ -43,12 +41,9 @@ def show_pokemon(request, pokemon_id):
 
     for entity in actual_pokemon_entities:
         show_pokemon_on_map(request=request, entity=entity, folium_map=folium_map)
-    try:
-        pokemon = Pokemon.objects.get(id=pokemon_id)
-    except (MultipleObjectsReturned, ObjectDoesNotExist):
-        return HttpResponseNotFound('<h1>Такой покемон не найден</h1>')
 
-    serialized_pokemon = serialize_pokemon(request=request, pokemon=pokemon, pokemon_id=pokemon_id)
+    pokemon = get_object_or_404(Pokemon, pk=pokemon_id)
+    serialized_pokemon = serialize_pokemon(request=request, pokemon=pokemon)
     context = {'map': folium_map._repr_html_(), 'pokemon': serialized_pokemon}
 
     return render(request, 'pokemon.html', context=context)
