@@ -2,6 +2,18 @@
 from django.db import models  # noqa F401
 
 
+class PokemonElementType(models.Model):
+    """PokemonElementType, M2M related to the Pokemon model."""
+    title = models.CharField(max_length=255, verbose_name='Название')
+
+    class Meta:
+        verbose_name = "Стихия"
+        verbose_name_plural = "Стихии"
+
+    def __str__(self):
+        return self.title
+
+
 class Pokemon(models.Model):
     """Pokemon model."""
     title_ru = models.CharField(max_length=255, verbose_name='Название на русском')
@@ -9,6 +21,7 @@ class Pokemon(models.Model):
     title_jp = models.CharField(max_length=255, blank=True, verbose_name='Название на японском')
     image = models.ImageField(blank=True, null=True, upload_to='pokemons', verbose_name='Изображение')
     description = models.TextField(blank=True, verbose_name='Описание')
+    element_type = models.ManyToManyField(PokemonElementType, verbose_name='Стихии')
     previous_evolution = models.ForeignKey(
         'self', on_delete=models.SET_NULL, null=True, blank=True,
         verbose_name='Из кого эволюционировал', related_name='next_evolutions',
@@ -44,9 +57,3 @@ class PokemonEntity(models.Model):
 
     def __str__(self):
         return self.pokemon.title_ru
-
-
-class PokemonElementType:
-    """PokemonElementType, related to the Pokemon model."""
-    title = models.CharField(max_length=255, verbose_name='Название')
-    pokemon = models.ManyToManyField(Pokemon)
