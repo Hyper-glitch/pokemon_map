@@ -6,6 +6,9 @@ class PokemonElementType(models.Model):
     """PokemonElementType, M2M related to the Pokemon model."""
     title = models.CharField(max_length=255, verbose_name='Название')
     image = models.ImageField(blank=True, null=True, upload_to='elements', verbose_name='Изображение')
+    strong_against = models.ManyToManyField(
+        'self', null=True, blank=True, symmetrical=False, verbose_name='Силён против',
+    )
 
     class Meta:
         verbose_name = "Стихия"
