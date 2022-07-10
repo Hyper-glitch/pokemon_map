@@ -64,7 +64,11 @@ def serialize_pokemon(request, pokemon: Pokemon) -> dict:
         }
 
     serialized_elements = [
-        {'title': element.title, 'img': build_uri(request, element.image.url)}
+        {
+            'title': element.title,
+            'img': build_uri(request, element.image.url),
+            'strong_against': [element.title for element in element.strong_against.all()],
+        }
         for element in elements
     ]
 
