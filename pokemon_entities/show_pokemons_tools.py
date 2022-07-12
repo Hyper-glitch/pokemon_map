@@ -75,13 +75,13 @@ def prepare_detailed_info(entity: PokemonEntity) -> str:
     :param entity: pokemon's entity obj from database.
     :return detailed_info: detailed pokemon's information.
     """
-    description_slice = 7
-    needful_fields = entity._meta.get_fields()[description_slice:]
-    field_values = [entity.level, entity.health, entity.strength, entity.defence, entity.stamina]
+    description_slice = 6
+    serialize_pokemon_fields = PokemonEntity.pokemons.filter(pk=entity.pk).values()
+    needed_fields = list(serialize_pokemon_fields[0].items())[description_slice:]
     detailed_info = ''
 
-    for field, value in zip(needful_fields, field_values):
-        detailed_info += f'{field.verbose_name}: {value}\n'
+    for field in needed_fields:
+        detailed_info += f'{field[0]}: {field[1]}\n'
     return detailed_info
 
 
