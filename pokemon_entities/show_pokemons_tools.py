@@ -37,27 +37,27 @@ def serialize_pokemon(request, pokemon: Pokemon) -> dict:
         serialized_next_evolution = {
             'title_ru': next_evolution_entity.title_ru,
             'pokemon_id': next_evolution_entity.id,
-            'img_url': build_uri(request, next_evolution_entity.image.url),
+            'img_url': request.build_absolute_uri(next_evolution_entity.image.url),
         }
 
     if pokemon.previous_evolution:
         previous_evolution = {
             'title_ru': pokemon.previous_evolution.title_ru,
             'pokemon_id': pokemon.previous_evolution.id,
-            'img_url': build_uri(request, pokemon.previous_evolution.image.url),
+            'img_url': request.build_absolute_uri(pokemon.previous_evolution.image.url),
         }
 
     serialized_elements = [
         {
             'title': element.title,
-            'img': build_uri(request, element.image.url),
+            'img': request.build_absolute_uri(element.image.url),
             'strong_against': [element.title for element in element.strong_against.all()],
         }
         for element in elements
     ]
 
     serialized_pokemon = {
-        'img_url': build_uri(request, pokemon.image.url),
+        'img_url': request.build_absolute_uri(pokemon.image.url),
         'title_ru': pokemon.title_ru,
         'title_en': pokemon.title_en,
         'title_jp': pokemon.title_jp,
@@ -83,13 +83,3 @@ def prepare_detailed_info(entity: PokemonEntity) -> str:
     for field in needed_fields:
         detailed_info += f'{field[0]}: {field[1]}\n'
     return detailed_info
-
-
-def build_uri(request, url: str) -> str:
-    """
-    Build and return an absolute uri.
-    :param request: request: request from template side.
-    :param url: an url of image.
-    :return: absolute uri.
-    """
-    return request.build_absolute_uri(url)
