@@ -42,7 +42,14 @@ class Pokemon(models.Model):
 
 
 class PokemonEntityQuerySet(models.QuerySet):
+    """PokemonEntityQuerySet."""
     def on_map(self, pokemon_id=None, show_all=None):
+        """
+        Filter pokemon's entities from database in order to appeared and disappeared time. Also could show all pokemons.
+        :param pokemon_id: id of a pokemon obj.
+        :param show_all: flag that control to render all pokemons or one entity.
+        :return: all_entities: filtered entities queryset.
+        """
         now = timezone.localtime()
         all_entities = self.filter(Q(appeared_at__lt=now) & Q(disappeared_at__gt=now))
         if not show_all:
