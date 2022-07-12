@@ -1,9 +1,9 @@
 import folium
 from django.shortcuts import render, get_object_or_404
 
-from pokemon_entities.models import Pokemon
+from pokemon_entities.models import Pokemon, PokemonEntity
 from pokemon_entities.show_pokemons_tools import (
-    show_pokemon_on_map, MOSCOW_CENTER, get_actual_pokemons,
+    show_pokemon_on_map, MOSCOW_CENTER,
     serialize_pokemon,
 )
 
@@ -12,7 +12,7 @@ def show_all_pokemons(request):
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
     serialized_pokemons = []
     pokemons = Pokemon.objects.all()
-    actual_pokemon_entities = get_actual_pokemons(show_all=True)
+    actual_pokemon_entities = PokemonEntity.pokemons.on_map(show_all=True)
 
     for entity in actual_pokemon_entities:
         show_pokemon_on_map(request=request, entity=entity, folium_map=folium_map)
@@ -37,7 +37,7 @@ def show_all_pokemons(request):
 
 def show_pokemon(request, pokemon_id):
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
-    actual_pokemon_entities = get_actual_pokemons(pokemon_id=pokemon_id, show_all=False)
+    actual_pokemon_entities = PokemonEntity.pokemons.on_map(pokemon_id=pokemon_id, show_all=False)
 
     for entity in actual_pokemon_entities:
         show_pokemon_on_map(request=request, entity=entity, folium_map=folium_map)
