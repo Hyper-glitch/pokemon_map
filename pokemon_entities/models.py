@@ -1,5 +1,7 @@
 """Module for Pokemon and PokemonEntity models."""
 from django.db import models  # noqa F401
+from django.db.models import Q
+from django.utils import timezone
 
 
 class PokemonElementType(models.Model):
@@ -39,6 +41,15 @@ class Pokemon(models.Model):
         return self.title_ru
 
 
+class PokemonEntityQuerySet(models.QuerySet):
+    def on_map(self, pokemon_id=None, show_all=None):
+        now = timezone.localtime()
+        all_entities = self.filter(Q(appeared_at__lt=now) & Q(disappeared_at__gt=now))
+        if not show_all:
+            all_entities = all_entities.filter(pokemon__id=pokemon_id)
+        return all_entities
+
+
 class PokemonEntity(models.Model):
     """PokemonEntity, related to the Pokemon model."""
     pokemon = models.ForeignKey(
@@ -54,6 +65,7 @@ class PokemonEntity(models.Model):
     strength = models.PositiveSmallIntegerField(verbose_name='Атака')
     defence = models.PositiveSmallIntegerField(verbose_name='Защита')
     stamina = models.PositiveSmallIntegerField(verbose_name='Выносливость')
+    pokemons = PokemonEntityQuerySet.as_manager()
 
     class Meta:
         verbose_name = "Особь покемона"
