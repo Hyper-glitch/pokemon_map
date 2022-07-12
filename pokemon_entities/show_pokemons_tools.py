@@ -1,7 +1,5 @@
 """Module that helps filter and show pokemons on a map."""
 import folium
-from django.db.models import Q
-from django.utils.timezone import localtime
 
 from pokemon_entities.models import PokemonEntity, Pokemon
 
@@ -21,20 +19,6 @@ def show_pokemon_on_map(request, entity: PokemonEntity, folium_map):
     detailed_info = prepare_detailed_info(entity=entity)
     # Warning! `tooltip` attribute is disabled intentionally to fix strange folium cyrillic encoding bug
     folium.Marker([entity.latitude, entity.longitude], popup=detailed_info, icon=icon).add_to(folium_map)
-
-
-def get_actual_pokemons(pokemon_id=None, show_all=None):
-    """
-    Filter pokemon's entities from database in order to appeared and disappeared time. Also could show all pokemons.
-    :param pokemon_id: id of a pokemon obj.
-    :param show_all: flag that control to render all pokemons or one entity.
-    :return: all_entities: filtered entities queryset.
-    """
-    now = localtime()
-    all_entities = PokemonEntity.objects.filter(Q(appeared_at__lt=now) & Q(disappeared_at__gt=now))
-    if not show_all:
-        all_entities = all_entities.filter(pokemon__id=pokemon_id)
-    return all_entities
 
 
 def serialize_pokemon(request, pokemon: Pokemon) -> dict:
