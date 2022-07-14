@@ -16,9 +16,9 @@ def show_pokemon_on_map(request, entity: PokemonEntity, folium_map):
     """
     image_url = request.build_absolute_uri(entity.pokemon.image.url)
     icon = folium.features.CustomIcon(image_url, icon_size=(50, 50))
-    detailed_info = prepare_detailed_info(entity=entity)
+    pokemon_info = prepare_popup_info(entity=entity)
     # Warning! `tooltip` attribute is disabled intentionally to fix strange folium cyrillic encoding bug
-    folium.Marker([entity.latitude, entity.longitude], popup=detailed_info, icon=icon).add_to(folium_map)
+    folium.Marker([entity.latitude, entity.longitude], popup=pokemon_info, icon=icon).add_to(folium_map)
 
 
 def serialize_pokemon(request, pokemon: Pokemon) -> dict:
@@ -69,15 +69,15 @@ def serialize_pokemon(request, pokemon: Pokemon) -> dict:
     return serialized_pokemon
 
 
-def prepare_detailed_info(entity: PokemonEntity) -> str:
+def prepare_popup_info(entity: PokemonEntity) -> str:
     """
-    Prepare data for detailed view of pokemon entity.
+    Prepare data for detailed view of pokemon entity on a popup window.
     :param entity: pokemon's entity obj from database.
     :return detailed_info: detailed pokemon's information.
     """
     description_slice = 6
-    serialize_pokemon_fields = PokemonEntity.pokemons.filter(pk=entity.pk).values()
-    needed_fields = list(serialize_pokemon_fields[0].items())[description_slice:]
+    serialized_pokemon_fields = PokemonEntity.pokemons.filter(pk=entity.pk).values()
+    needed_fields = list(serialized_pokemon_fields[0].items())[description_slice:]
     detailed_info = ''
 
     for field in needed_fields:
